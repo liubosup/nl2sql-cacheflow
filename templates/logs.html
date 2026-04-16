@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>查询历史</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hero compact">
+      <div>
+        <p class="eyebrow">History</p>
+        <h1>最近查询记录</h1>
+      </div>
+      <a class="ghost-link" href="/">返回首页</a>
+    </section>
+
+    {% for log in logs %}
+    <article class="panel log-card">
+      <div class="log-meta">
+        <span>ID {{ log.id }}</span>
+        <span>{{ log.created_at }}</span>
+        <span>{{ log.status }}</span>
+      </div>
+      <h2>{{ log.question }}</h2>
+      <p class="muted">归一化后：{{ log.normalized_question }}</p>
+      <pre>{{ log.sql }}</pre>
+      <p>{{ log.summary }}</p>
+      {% if log.result_rows %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              {% for col in log.result_rows[0].keys() %}
+              <th>{{ col }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in log.result_rows[:20] %}
+            <tr>
+              {% for value in row.values() %}
+              <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+    </article>
+    {% else %}
+    <section class="panel">
+      <p class="muted">还没有查询记录。</p>
+    </section>
+    {% endfor %}
+  </main>
+</body>
+</html>

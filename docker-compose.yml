@@ -1,0 +1,12 @@
+services:
+  nl2sql-cacheflow:
+    build: .
+    container_name: nl2sql-cacheflow
+    ports:
+      - "8082:8082"
+    environment:
+      NL2SQL_REBUILD_LEGACY_ENV: "${NL2SQL_REBUILD_LEGACY_ENV:-local}"
+      NL2SQL_REBUILD_USE_LEGACY_LLM: "${NL2SQL_REBUILD_USE_LEGACY_LLM:-0}"
+      NL2SQL_REBUILD_USE_LEGACY_DB: "${NL2SQL_REBUILD_USE_LEGACY_DB:-0}"
+      NL2SQL_REBUILD_USE_LEGACY_WECOM: "${NL2SQL_REBUILD_USE_LEGACY_WECOM:-0}"
+    restart: unless-stopped

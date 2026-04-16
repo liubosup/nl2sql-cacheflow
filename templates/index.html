@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NL2SQL Rebuild</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">NL2SQL Rebuild</p>
+        <h1>重建后的自然语言 SQL 系统</h1>
+        <p class="lede">保留旧工程的提问体验、SQL 展示和历史记录页面，但内核已经换成新的 cache-first workflow。</p>
+      </div>
+      <a class="ghost-link" href="/logs">查看历史记录</a>
+    </section>
+
+    <section class="panel">
+      <form method="post" action="/ask" id="ask-form">
+        <label for="question">请输入问题</label>
+        <input id="question" name="question" list="suggestions" placeholder="例如：2024年订单数量是多少" value="{{ question or '' }}">
+        <datalist id="suggestions">
+          {% for suggestion in suggestions %}
+          <option value="{{ suggestion }}">
+          {% endfor %}
+        </datalist>
+        <div class="actions">
+          <button type="submit">提交</button>
+        </div>
+      </form>
+    </section>
+
+    {% if result %}
+    <section class="grid">
+      <article class="panel">
+        <h2>生成 SQL</h2>
+        <pre>{{ result.sql }}</pre>
+      </article>
+      <article class="panel">
+        <h2>分析摘要</h2>
+        <p>{{ result.summary }}</p>
+        <h3>结构化信息</h3>
+        <pre>{{ result.query_info }}</pre>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>数据结果</h2>
+      {% if result.result %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              {% for col in result.result[0].keys() %}
+              <th>{{ col }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in result.result[:30] %}
+            <tr>
+              {% for value in row.values() %}
+              <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="muted">当前执行器是 guarded 版本，默认返回空结果集，但 SQL 和流程已完整展示。</p>
+      {% endif %}
+    </section>
+    {% endif %}
+  </main>
+
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-card">正在处理中，请稍候...</div>
+  </div>
+
+  <script>
+    window.onload = () => {
+      document.getElementById("loading-overlay").style.display = "none";
+    };
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("ask-form");
+      form.addEventListener("submit", function (e) {
+        const input = document.getElementById("question");
+        if (!input.value.trim()) {
+          alert("请输入问题再提交");
+          e.preventDefault();
+          return;
+        }
+        document.getElementById("loading-overlay").style.display = "flex";
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+[
+  {
+    "join_table": "dim.dim_mer_mer_info",
+    "on": "ads.ads_trans_all_order_mbpb_d.mer_id = dim.dim_mer_mer_info.mer_id",
+    "trigger_keywords": ["商户地址", "商户星级", "商户类型"],
+    "required_fields": "star",
+    "exclude_if_main_has": ["star", "type"]
+  },
+  {
+    "join_table": "dim.dim_prd_all_prd_base_info",
+    "on": "ads.ads_trans_all_order_mbpb_d.prd_id = dim.dim_prd_all_prd_base_info.prd_id",
+    "trigger_keywords": ["商品类型", "商品库存", "商品总销量"],
+    "required_fields": "category",
+    "exclude_if_main_has": ["product_id", "category"]
+  },
+  {
+    "join_table": "dim.end_area_region",
+    "on": "ads.ads_trans_all_order_eb.prd_mer_prov = dim.end_area_region.province_name",
+    "trigger_keywords": ["华北", "东北", "华东", "华中", "华南", "西南","西北"],
+    "required_fields": ["region_name"],
+    "exclude_if_main_has": ["region_name"]
+  }
+]
