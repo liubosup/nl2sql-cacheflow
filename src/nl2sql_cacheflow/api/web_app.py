@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Any
 from dataclasses import asdict
+import os
 
 from nl2sql_cacheflow.application.query_service import QueryApplicationService
 from nl2sql_cacheflow.application.runtime import build_legacy_runtime_bundle
@@ -20,7 +21,7 @@ def create_app() -> Any:
         ) from exc
 
     app = FastAPI(title="NL2SQL Rebuild")
-    package_root = Path(__file__).resolve().parents[3]
+    package_root = _resolve_app_root()
     templates = Jinja2Templates(directory=str(package_root / "templates"))
     app.mount("/static", StaticFiles(directory=str(package_root / "static")), name="static")
 
@@ -110,3 +111,21 @@ def _default_suggestions() -> list[str]:
         "北京瑰丽酒店去年4月交易订单明细",
         "今年每个月的 GMV",
     ]
+
+
+def _resolve_app_root() -> Path:
+    candidates = []
+    env_root = os.getenv("NL2SQL_CACHEFLOW_HOME")
+    if env_root:
+        candidates.append(Path(env_root))
+    candidates.extend(
+        [
+            Path.cwd(),
+            Path(__file__).resolve().parents[3],
+            Path(__file__).resolve().parents[4],
+        ]
+    )
+    for candidate in candidates:
+        if (candidate / "templates").exists() and (candidate / "static").exists():
+            return candidate
+    raise RuntimeError("Unable to locate application root with templates/ and static/ directories.")
