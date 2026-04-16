@@ -25,7 +25,7 @@ def create_app() -> Any:
     templates = Jinja2Templates(directory=str(package_root / "templates"))
     app.mount("/static", StaticFiles(directory=str(package_root / "static")), name="static")
 
-    runtime_bundle = build_legacy_runtime_bundle(root_dir=package_root.parent)
+    runtime_bundle = build_legacy_runtime_bundle(root_dir=package_root)
     csv_export_path = package_root / "runtime" / "last_detail.csv"
     service = QueryApplicationService(
         workflow=runtime_bundle.workflow,
